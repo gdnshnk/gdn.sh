@@ -1,13 +1,2 @@
-# Proof of Human Work – Integrity Snapshot
-# Node: gdn.sh : node[00]
-# Type: Human-Authorship Node
-# Version: v1.0.0-node00
-# Generated: 2025-10-24T00:00:00Z
-# Purpose: Cryptographic proof of file integrity at release.
-
-b3cf7736eb8a870dfeaa43a9f9ff14c1295c8f143f28a30cd6f04cb821578ee2  index.html
-361132bb73b257cb8fcb0001d2328005f6b33b6ac5359f2394bc01c7571cc646  .well-known/public.txt
-
-# Registry-Reference: https://proofofhumanwork.org
-# Verification-Path: https://gdn.sh/.well-known/public.txt
-# End-of-Record
+canonical JSON : 1974b436a7d4f9681c01bf956eddd6254c4a3be440f1d1a47a511c9b90ed2eff
+timestamp : 2025-10-24T22:14:50Z
