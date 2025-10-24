@@ -1,4 +1,0 @@
-/pohw/verify/*
-  Access-Control-Allow-Origin: https://proofofhumanwork.org
-  Access-Control-Allow-Methods: GET
-  Access-Control-Allow-Headers: Content-Type
