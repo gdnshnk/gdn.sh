@@ -1,7 +1,9 @@
 -----BEGIN PROOF OF HUMAN WORK PUBLIC KEY-----
+
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKfGgVqGvExampleKeyTextHere gideon.sh
+
 -----END PROOF OF HUMAN WORK PUBLIC KEY-----
 
-Fingerprint: SHA256:72f4e2a1b6a9f24d57bce0b91c40afc198ec9d7ad03d2ef78b8a3b7aef2cafc1
-Generated: 2025-10-22
-Integrity-Anchor: https://gdn.sh/pohw/verify
+FINGERPRINT: SHA256:72f4e2a1b694f24d57bce0b91c40afc198ec9d7ad03d2ef78b8a3b7aef2cafc1
+GENERATED: 2025-10-24T00:00:00Z
+INTEGRITY-ANCHOR: https://gdn.sh/pohw/verify
