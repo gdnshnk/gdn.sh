@@ -31,23 +31,32 @@ pre {
   color: #000;
 }
 
-/* --- verification block --- */
-pre hr, pre #verification-block, pre .verification-block {
-  margin-top: 2em;
-  border: none;
+/* --- verification block (badge zone) --- */
+.verification-block {
+  display: block;
+  margin-top: 2.5em;
+  padding: 1em 0 0 0;
   border-top: 1px dashed #333;
-  padding-top: 1em;
-  opacity: 0.85;
+  color: #a0ffa0;
+  opacity: 0.9;
+  font-size: 0.9em;
+  text-shadow: 0 0 3px rgba(0,255,120,0.25);
+  transition: opacity 0.4s ease-in-out;
 }
 
-pre .verification-block a {
+.verification-block:hover {
+  opacity: 1;
+}
+
+.verification-block a {
   color: #00ff9c;
   border-bottom: 1px dotted #00ff9c;
   text-decoration: none;
 }
 
-pre .verification-block a:hover {
+.verification-block a:hover {
   color: #adffda;
+  text-shadow: 0 0 4px rgba(0,255,150,0.4);
 }
 
 @media (max-width: 600px) {
