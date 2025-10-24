@@ -2,7 +2,7 @@
   "node": "gdn.sh",
   "type": "verification-node",
   "protocol": "Proof of Human Work",
-  "hash": "0x72f4e2a1b694f24d57bce0b91c40afc198ec9d7ad03d2ef78b8a3b7aef2cafc1",
+  "hash": "0x361132bb73b257cb8fcb0001d2328005f6b33b6ac5359f2394bc01c7571cc646",
   "registry": "https://proofofhumanwork.org",
   "public_key": "https://gdn.sh/.well-known/public.txt",
   "status": "active",
