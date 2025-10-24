@@ -27,6 +27,15 @@ last update : 2025-10-24
 > public key : <a href="/.well-known/public.txt">/.well-known/public.txt</a>
 
 # waiting-for-input _
+
+
+-------------------------------------------------
+authorship-proof : <a href="/pohw/verify/index.cjson">canonical record</a>
+signature        : <a href="/pohw/verify/index.cjson.sig">ed25519 signature</a>
+verify-command   : ssh-keygen -Y verify -f allowed_signers -I gdn.sh -n pohw -s index.cjson.sig &lt; index.cjson
+integrity-hash   : 1974b436a7d4f9681c01bf956eddd6254c4a3be440f1d1a47a511c9b90ed2eff
+registry-anchor  : <a href="https://proofofhumanwork.org">proofofhumanwork.org</a>
+-------------------------------------------------
 </pre>
 </main>
 
