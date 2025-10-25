@@ -30,8 +30,7 @@ jobs:
       - name: Run signing script
         env:
           SIGNING_KEY_PATH: ~/.ssh/id_signer.pem
-        run: |
-          bash sign.sh
+        run: bash sign.sh
 
       - name: Commit and push signed outputs
         env:
