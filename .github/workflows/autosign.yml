@@ -5,6 +5,9 @@ on:
     - cron: "0 0 * * FRI"      # Every Friday 00:00 UTC
   workflow_dispatch:            # Allow manual runs
 
+permissions:
+  contents: write    # Allow this workflow to push changes back to the repo
+
 jobs:
   sign:
     runs-on: ubuntu-latest
@@ -45,8 +48,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "PoHW Auto-Signer"
-          git config user.email "auto@pohw"
+          git config --global user.name "PoHW Auto-Signer"
+          git config --global user.email "auto@pohw"
           git add -A
           git commit -m "Auto-sign verification record ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
-          git push
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
