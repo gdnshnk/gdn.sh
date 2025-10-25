@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-# === Proof of Human Work Auto-Signer (Full Version) ===
+# === Proof of Human Work Auto-Signer ===
 # Regenerates hashes, canonical JSON, signatures, and homepage hash line
 
 JSON_PATH="pohw/verify/index.json"
-SIG_PATH="pohw/verify/index.sig.json"
+SIG_PATH="pohw/verify/index.sig.b64"
 HASH_PATH="HASH.txt"
 INDEX_PATH="index.html"
 
@@ -16,8 +16,10 @@ echo "== Hashing canonical JSON =="
 HASH=$(sha256sum "$JSON_PATH" | awk '{print $1}')
 echo "Hash: $HASH"
 
-echo "== Signing canonical JSON with SSH key =="
-ssh-keygen -Y sign -f ~/.ssh/id_signer.pem -n pohw "$JSON_PATH"
+echo "== Signing canonical JSON with OpenSSL =="
+openssl dgst -sha256 -sign ~/.ssh/id_signer.pem -out pohw/verify/index.sig.bin "$JSON_PATH"
+openssl base64 -in pohw/verify/index.sig.bin -out "$SIG_PATH"
+echo "Signature written to $SIG_PATH"
 
 echo "== Recording hash =="
 {
@@ -29,7 +31,7 @@ echo "== Updating homepage hash =="
 if grep -q "hash :" "$INDEX_PATH"; then
   sed -i "s|hash : [0-9a-fx]*|hash : 0x$HASH|g" "$INDEX_PATH"
 else
-  echo "⚠️  No hash line found in index.html — skipped updating."
+  echo "No hash line found in index.html — skipped updating."
 fi
 
 echo "== Committing and pushing updates =="
