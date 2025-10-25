@@ -3,18 +3,20 @@ name: Auto Sign Verification Record
 on:
   schedule:
     - cron: "0 0 * * FRI"      # Every Friday 00:00 UTC
-  workflow_dispatch:            # Allow manual runs
+  workflow_dispatch:
 
 permissions:
-  contents: write    # Allow this workflow to push changes back to the repo
+  contents: write
 
 jobs:
   sign:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (with push access)
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install required tools
         run: |
@@ -52,4 +54,4 @@ jobs:
           git config --global user.email "auto@pohw"
           git add -A
           git commit -m "Auto-sign verification record ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+          git push
