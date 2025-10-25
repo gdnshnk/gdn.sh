@@ -2,42 +2,39 @@
 set -e
 
 # === Proof of Human Work Auto-Signer (Full Version) ===
-# regenerates hashes, canonical JSON, signatures, and homepage hash line
+# Regenerates hashes, canonical JSON, signatures, and homepage hash line
 
 JSON_PATH="pohw/verify/index.json"
-CJSON_PATH="pohw/verify/index.cjson"
-SIG_PATH="pohw/verify/index.cjson.sig"
+SIG_PATH="pohw/verify/index.sig.json"
 HASH_PATH="HASH.txt"
 INDEX_PATH="index.html"
 
-echo "→ Canonicalizing $JSON_PATH"
-jq -cS . "$JSON_PATH" > "$CJSON_PATH"
+echo "== Canonicalizing JSON =="
+jq -S . "$JSON_PATH" > "$JSON_PATH.tmp" && mv "$JSON_PATH.tmp" "$JSON_PATH"
 
-echo "→ Hashing canonical JSON"
-HASH=$(shasum -a 256 "$CJSON_PATH" | awk '{print $1}')
-echo "hash : $HASH"
+echo "== Hashing canonical JSON =="
+HASH=$(sha256sum "$JSON_PATH" | awk '{print $1}')
+echo "Hash: $HASH"
 
-echo "→ Signing canonical JSON with SSH key"
-ssh-keygen -Y sign -f ~/.ssh/id_ed25519 -n pohw "$CJSON_PATH"
+echo "== Signing canonical JSON with SSH key =="
+ssh-keygen -Y sign -f ~/.ssh/id_signer.pem -n pohw "$JSON_PATH"
 
-echo "→ Recording hash"
+echo "== Recording hash =="
 {
   echo "canonical JSON : $HASH"
-  date +"timestamp : %Y-%m-%dT%H:%M:%SZ"
+  date "+timestamp : %Y-%m-%dT%H:%M:%SZ"
 } > "$HASH_PATH"
 
-# --- update homepage hash ---
-echo "→ Updating homepage hash in $INDEX_PATH"
+echo "== Updating homepage hash =="
 if grep -q "hash :" "$INDEX_PATH"; then
-  # replace existing hash line
-  sed -i '' "s|hash : 0x[0-9a-fA-F]*|hash : 0x$HASH|" "$INDEX_PATH"
+  sed -i "s|hash : [0-9a-fx]*|hash : 0x$HASH|g" "$INDEX_PATH"
 else
-  echo "⚠️  No 'hash :' line found in index.html — skipped updating."
+  echo "⚠️  No hash line found in index.html — skipped updating."
 fi
 
-echo "→ Committing and pushing updates"
-git add "$CJSON_PATH" "$SIG_PATH" "$HASH_PATH" "$INDEX_PATH"
-git commit -m "Auto-sign and update homepage hash ($(date +%Y-%m-%d))"
+echo "== Committing and pushing updates =="
+git add "$JSON_PATH" "$SIG_PATH" "$HASH_PATH" "$INDEX_PATH"
+git commit -m "Auto-sign and update homepage hash ($(date +%Y-%m-%d))" || true
 git push
 
-echo "✅ Done: new signature + homepage hash published"
+echo "== Done: new signature + homepage hash published =="
