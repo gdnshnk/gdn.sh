@@ -2,7 +2,7 @@ name: Auto Sign Verification Record
 
 on:
   schedule:
-    - cron: "0 0 * * FRI"
+    - cron: "0 0 * * FRI"   # runs every Friday at midnight UTC
   workflow_dispatch:
 
 permissions:
@@ -41,6 +41,11 @@ jobs:
           echo "== Hex dump =="
           xxd -l 64 ~/.ssh/id_signer.pem
 
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "PoHW CI"
+          git config --global user.email "ci@proofofhumanwork.org"
+
       - name: Run signing script
         env:
           SIGNING_KEY_PATH: ~/.ssh/id_signer.pem
@@ -50,13 +55,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.name "PoHW Auto-Signer"
-          git config --global user.email "auto-signer@users.noreply.github.com"
-
-          # Re-add remote with token authentication
+          # Ensure authenticated remote
           git remote remove origin
           git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
 
+          # Stage and push updates
           git add -A
           git commit -m "Auto-sign verification record ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref }}
