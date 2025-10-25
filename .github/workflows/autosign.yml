@@ -16,7 +16,7 @@ jobs:
       - name: Install required tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq openssh-client
+          sudo apt-get install -y jq openssh-client openssl xxd
 
       - name: Install SSH private key (PKCS#8 PEM)
         env:
@@ -26,6 +26,15 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_signer.pem
           chmod 600 ~/.ssh/id_signer.pem
           ssh-keygen -y -f ~/.ssh/id_signer.pem > ~/.ssh/id_signer.pub || true
+
+      - name: Debug PEM key file
+        run: |
+          echo "== File info =="
+          ls -l ~/.ssh/id_signer.pem || echo "File not found"
+          echo "== First few lines =="
+          head -5 ~/.ssh/id_signer.pem || true
+          echo "== Hex dump of header =="
+          xxd -l 64 ~/.ssh/id_signer.pem || true
 
       - name: Run signing script
         env:
@@ -40,4 +49,4 @@ jobs:
           git config user.email "auto@pohw"
           git add -A
           git commit -m "Auto-sign verification record ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
-          git push# reload
+          git push
