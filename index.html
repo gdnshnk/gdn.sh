@@ -28,27 +28,26 @@ last update : 2025-10-24
 
 # waiting-for-input _
 
-<div class="verification-block">
--------------------------------------------------
-authorship-proof : <a href="/pohw/verify/index.cjson">canonical record</a>  
-signature        : <a href="/pohw/verify/index.cjson.sig">ed25519 signature</a>  
-verify-command   : ssh-keygen -Y verify -f allowed_signers -I gdn.sh -n pohw -s index.cjson.sig &lt; index.cjson  
-integrity-hash   : 1974b436a7d4f9681c01bf956eddd6254c4a3be440f1d1a47a511c9b90ed2eff  
-registry-anchor  : <a href="https://proofofhumanwork.org">proofofhumanwork.org</a>  
--------------------------------------------------
-</div>
 
 <div class="verification-block">
 -------------------------------------------------
 attestation-proof : <a href="/pohw/verify/index.cjson">canonical record</a>  
 signature          : <a href="/pohw/verify/index.sig.bin">rsa-pkcs#8 signature</a>  
 verify-command     : openssl dgst -sha256 -verify .well-known/pohw-ci-public.pem -signature pohw/verify/index.sig.bin pohw/verify/index.cjson  
-integrity-hash     : 9642f0d7b915cb7c45a595b88287c4e41804d1727ec8679a1e8f958ebb2d4318  
+integrity-hash     : 0x9642f0d7b915cb7c45a595b88287c4e41804d1727ec8679a1e8f958ebb2d4318  
 verifier-key       : <a href="https://gdn.sh/.well-known/pohw-ci-public.pem">https://gdn.sh/.well-known/pohw-ci-public.pem</a>  
 registry-anchor    : <a href="https://proofofhumanwork.org">https://proofofhumanwork.org</a>  
+verified-on        : 2025-10-25T00:00:00Z  
 -------------------------------------------------
 </div>
 
+<div class="verification-block">
+[ legacy : deprecated 2025-10-25 ]  
+authorship-proof : <a href="/pohw/verify/index.cjson">canonical record</a>  
+signature        : <a href="/pohw/verify/index.cjson.sig">ed25519 (retired)</a>  
+verify-command   : ssh-keygen -Y verify -f allowed_signers -I gdn.sh -n pohw -s index.cjson.sig &lt; index.cjson  
+integrity-hash   : 1974b436a7d4f9681c01bf956eddd6254c4a3be440f1d1a47a511c9b90ed2eff  
+</div>
 </pre>
 </main>
 
