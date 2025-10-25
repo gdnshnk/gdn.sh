@@ -2,7 +2,7 @@ name: Auto Sign Verification Record
 
 on:
   schedule:
-    - cron: "0 0 * * FRI"      # Every Friday 00:00 UTC
+    - cron: "0 0 * * FRI"
   workflow_dispatch:
 
 permissions:
@@ -13,17 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository (with push access)
+      - name: Checkout repository with push access
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install required tools
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq openssh-client openssl xxd
 
-      - name: Install SSH private key (PKCS#8 PEM)
+      - name: Install SSH private key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.POHW_SIGNING_KEY }}
         run: |
@@ -32,26 +32,31 @@ jobs:
           chmod 600 ~/.ssh/id_signer.pem
           ssh-keygen -y -f ~/.ssh/id_signer.pem > ~/.ssh/id_signer.pub || true
 
-      - name: Debug PEM key file
+      - name: Debug PEM file
         run: |
           echo "== File info =="
-          ls -l ~/.ssh/id_signer.pem || echo "File not found"
+          ls -l ~/.ssh/id_signer.pem
           echo "== First few lines =="
-          head -5 ~/.ssh/id_signer.pem || true
-          echo "== Hex dump of header =="
-          xxd -l 64 ~/.ssh/id_signer.pem || true
+          head -5 ~/.ssh/id_signer.pem
+          echo "== Hex dump =="
+          xxd -l 64 ~/.ssh/id_signer.pem
 
       - name: Run signing script
         env:
           SIGNING_KEY_PATH: ~/.ssh/id_signer.pem
         run: bash sign.sh
 
-      - name: Commit and push signed outputs
+      - name: Commit and push results
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "PoHW Auto-Signer"
-          git config --global user.email "auto@pohw"
+          git config --global user.email "auto-signer@users.noreply.github.com"
+
+          # Re-add remote with token authentication
+          git remote remove origin
+          git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+
           git add -A
           git commit -m "Auto-sign verification record ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
-          git push
+          git push origin HEAD:${{ github.ref }}
