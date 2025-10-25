@@ -40,4 +40,4 @@ jobs:
           git config user.email "auto@pohw"
           git add -A
           git commit -m "Auto-sign verification record ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
-          git push
+          git push# reload
