@@ -8,14 +8,17 @@ on:
 jobs:
   sign:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install tools
-        run: sudo apt-get update && sudo apt-get install -y jq openssh-client
+      - name: Install required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq openssh-client
 
-      - name: Install SSH private key for signing
+      - name: Install SSH private key (PKCS#8 PEM)
         env:
           SSH_PRIVATE_KEY: ${{ secrets.POHW_SIGNING_KEY }}
         run: |
@@ -24,10 +27,13 @@ jobs:
           chmod 600 ~/.ssh/id_signer.pem
           ssh-keygen -y -f ~/.ssh/id_signer.pem > ~/.ssh/id_signer.pub || true
 
-      - name: Run signer
-        run: bash sign.sh
+      - name: Run signing script
+        env:
+          SIGNING_KEY_PATH: ~/.ssh/id_signer.pem
+        run: |
+          bash sign.sh
 
-      - name: Commit & push (if changed)
+      - name: Commit and push signed outputs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
