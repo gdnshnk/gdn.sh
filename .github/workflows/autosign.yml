@@ -2,7 +2,7 @@ name: Auto Sign Verification Record
 
 on:
   schedule:
-    - cron: "0 0 * * FRI"   # runs every Friday at midnight UTC
+    - cron: "0 0 * * FRI"
   workflow_dispatch:
 
 permissions:
@@ -11,19 +11,30 @@ permissions:
 jobs:
   sign:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository with push access
+      - name: Checkout (fetch full history so rebase works)
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Install dependencies
+      - name: Set git identity
+        run: |
+          git config --global user.name  "PoHW CI"
+          git config --global user.email "auto-signer@users.noreply.github.com"
+
+      - name: Ensure up-to-date before work
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull --rebase origin main
+
+      - name: Install deps
         run: |
           sudo apt-get update
           sudo apt-get install -y jq openssh-client openssl xxd
 
-      - name: Install SSH private key
+      - name: Install signing key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.POHW_SIGNING_KEY }}
         run: |
@@ -32,34 +43,29 @@ jobs:
           chmod 600 ~/.ssh/id_signer.pem
           ssh-keygen -y -f ~/.ssh/id_signer.pem > ~/.ssh/id_signer.pub || true
 
-      - name: Debug PEM file
+      - name: Debug PEM
         run: |
-          echo "== File info =="
-          ls -l ~/.ssh/id_signer.pem
-          echo "== First few lines =="
-          head -5 ~/.ssh/id_signer.pem
-          echo "== Hex dump =="
-          xxd -l 64 ~/.ssh/id_signer.pem
-
-      - name: Configure Git identity
-        run: |
-          git config --global user.name "PoHW CI"
-          git config --global user.email "ci@proofofhumanwork.org"
+          echo "== File info =="; ls -l ~/.ssh/id_signer.pem
+          echo "== First 5 lines =="; head -5 ~/.ssh/id_signer.pem || true
+          echo "== Hex dump =="; xxd -l 64 ~/.ssh/id_signer.pem || true
 
       - name: Run signing script
         env:
           SIGNING_KEY_PATH: ~/.ssh/id_signer.pem
         run: bash sign.sh
 
-      - name: Commit and push results
+      - name: Rebase again in case something landed while signing
+        run: |
+          git pull --rebase origin main || true
+
+      - name: Push results (token remote)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Ensure authenticated remote
-          git remote remove origin
+          git remote remove origin || true
           git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-
-          # Stage and push updates
           git add -A
-          git commit -m "Auto-sign verification record ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
-          git push origin HEAD:${{ github.ref }}
+          git commit -m "Auto-sign and update homepage hash ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))" || echo "No changes to commit"
+          # simple one-shot push
+          git push origin HEAD:main || \
+          (echo "push failed; rebasing once and retrying" && git pull --rebase origin main && git push origin HEAD:main)
