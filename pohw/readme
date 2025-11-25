@@ -1,22 +1,56 @@
 gdn.sh — PoHW Verification Node [00]
+══════════════════════════════════════
 
 STATUS: Active
 PROTOCOL: Proof of Human Work v1.0.0
 SIGNATURE FORMAT: SHA-256 • Ed25519
+NODE TYPE: Public Verification Node
 
-This node provides stateless verification endpoints for Proof of Human Work attestations.
+OVERVIEW
+────────
+This node provides stateless verification endpoints for Proof of Human Work
+attestations. It operates as Layer 4 (Retrieval) of the PoHW protocol stack,
+enabling open verification of authorship proofs without requiring trust in
+centralized authorities.
 
-VERIFICATION ENDPOINTS:
-- GET /pohw/verify/index.json — Node status and metadata
-- GET /pohw/verify/index.cjson — Canonical JSON for hashing
-- GET /pohw/verify/index.sig.bin — Binary signature file
+VERIFICATION ENDPOINTS
+──────────────────────
+GET /pohw/verify/index.json
+  Returns: Node status, protocol version, latest attestation hash, timestamp
 
-VERIFICATION:
-Upload file + signature → GET verdict (valid/invalid + signer DID + timestamp)
+GET /pohw/verify/index.cjson
+  Returns: Canonical JSON (sorted keys, no whitespace) for cryptographic hashing
 
-PUBLIC KEY:
-https://gdn.sh/.well-known/public.txt
+GET /pohw/verify/index.sig.bin
+  Returns: Binary signature file (RSA PKCS#8) of canonical JSON
 
-PROTOCOL SPECIFICATION:
-https://proofofhumanwork.org/spec
+GET /pohw/verify/index.sig.b64
+  Returns: Base64-encoded signature (alternate format)
 
+VERIFICATION PROCESS
+────────────────────
+1. Upload file + signature
+2. Node verifies signature against public key
+3. Returns verdict: valid/invalid + signer DID + timestamp
+
+PUBLIC KEY
+──────────
+Location: https://gdn.sh/.well-known/public.txt
+Format: SSH Ed25519 public key
+Fingerprint: SHA256:361132bb73b257cb8fcb0001d2328005f6b33b6ac5359f2394bc01c7571cc646
+
+PROTOCOL SPECIFICATION
+──────────────────────
+Full standard: https://proofofhumanwork.org/spec
+Registry: https://proofofhumanwork.org
+
+NODE OPERATION
+──────────────
+This node:
+• Accepts verification requests
+• Validates signatures cryptographically
+• Provides public verification endpoints
+• Maintains node status and metadata
+• Anchors to registry at proofofhumanwork.org
+
+For registry node operation, see: https://proofofhumanwork.org/registry
