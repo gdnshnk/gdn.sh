@@ -103,9 +103,18 @@ async function verifyByHash() {
   resultDiv.innerHTML = '⏳ Verifying...';
   
   try {
-    // Try registry node first
-    const registryUrl = `https://proofofhumanwork.org/pohw/verify/${hash}`;
-    const res = await fetch(registryUrl);
+    // Try local registry node first (if accessible)
+    // Then try the public registry
+    let res;
+    try {
+      // Try localhost first (for development)
+      res = await fetch(`http://localhost:3000/pohw/verify/${hash}`);
+      if (!res.ok) throw new Error('Local registry not accessible');
+    } catch (e) {
+      // Fallback to public registry (if available)
+      const registryUrl = `https://proofofhumanwork.org/pohw/verify/${hash}`;
+      res = await fetch(registryUrl);
+    }
     
     if (res.ok) {
       const data = await res.json();
