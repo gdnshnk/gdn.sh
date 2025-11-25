@@ -59,8 +59,10 @@ Fingerprint: SHA256:361132bb73b257cb8fcb0001d2328005f6b33b6ac5359f2394bc01c7571c
 
 REGISTRY
 ────────
-Primary Registry: https://proofofhumanwork.org
-Registry API: https://proofofhumanwork.org/pohw/verify/{hash}
+Primary Registry: <span id="registry-url">https://proofofhumanwork.org</span>
+Registry API: <span id="registry-api-url">https://proofofhumanwork.org/pohw/verify/{hash}</span>
+
+Note: Update REGISTRY_URL in the page source to point to your deployed registry node.
 
 PROTOCOL
 ────────
@@ -87,6 +89,10 @@ async function loadNodeStatus() {
   }
 }
 
+// Registry URL - Update this to your deployed registry node
+// For PoHW open verification, this should be a publicly accessible registry
+const REGISTRY_URL = window.REGISTRY_URL || 'https://proofofhumanwork.org';
+
 // Verify by hash
 async function verifyByHash() {
   const hash = document.getElementById('hash-input').value.trim();
@@ -97,24 +103,15 @@ async function verifyByHash() {
     return;
   }
   
-  // Remove 0x prefix if present for the API call
-  const cleanHash = hash.startsWith('0x') ? hash.substring(2) : hash;
+  // Ensure hash has 0x prefix
+  const fullHash = hash.startsWith('0x') ? hash : '0x' + hash;
   
   resultDiv.innerHTML = '⏳ Verifying...';
   
   try {
-    // Try local registry node first (if accessible)
-    // Then try the public registry
-    let res;
-    try {
-      // Try localhost first (for development)
-      res = await fetch(`http://localhost:3000/pohw/verify/${hash}`);
-      if (!res.ok) throw new Error('Local registry not accessible');
-    } catch (e) {
-      // Fallback to public registry (if available)
-      const registryUrl = `https://proofofhumanwork.org/pohw/verify/${hash}`;
-      res = await fetch(registryUrl);
-    }
+    // Try public registry node (PoHW open verification principle)
+    const registryUrl = `${REGISTRY_URL}/pohw/verify/${fullHash}`;
+    const res = await fetch(registryUrl);
     
     if (res.ok) {
       const data = await res.json();
@@ -139,13 +136,20 @@ async function verifyByHash() {
       } else {
         resultDiv.innerHTML = `⚠️  HASH NOT FOUND\n\n` +
           `This hash is not in the node's current status.\n` +
-          `Try the registry API: https://proofofhumanwork.org/pohw/verify/${hash}`;
+          `Try the registry API: ${REGISTRY_URL}/pohw/verify/${fullHash}`;
       }
     }
   } catch (err) {
-    resultDiv.innerHTML = `❌ ERROR\n\nFailed to verify: ${err.message}\n\n` +
+    resultDiv.innerHTML = `❌ VERIFICATION FAILED\n\n` +
+      `Error: ${err.message}\n\n` +
+      `Registry URL: ${REGISTRY_URL}\n` +
+      `Hash: ${fullHash}\n\n` +
+      `This may mean:\n` +
+      `1. The registry node is not publicly accessible\n` +
+      `2. The hash is not in the registry\n` +
+      `3. Network/CORS issue\n\n` +
       `Try the registry API directly:\n` +
-      `https://proofofhumanwork.org/pohw/verify/${hash}`;
+      `${REGISTRY_URL}/pohw/verify/${fullHash}`;
     console.error('Verification error:', err);
   }
 }
@@ -155,6 +159,12 @@ document.getElementById('hash-input').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
     verifyByHash();
   }
+});
+
+// Update registry URLs in display
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('registry-url').textContent = REGISTRY_URL;
+  document.getElementById('registry-api-url').textContent = `${REGISTRY_URL}/pohw/verify/{hash}`;
 });
 
 // Load status on page load
