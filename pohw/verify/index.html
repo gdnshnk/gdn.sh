@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gdn.sh — PoHW Verification</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<pre>gdn.sh — PoHW Verification Node [00]
+══════════════════════════════════════
+
+NODE STATUS
+───────────
+Status: <span id="node-status">loading...</span>
+Latest Hash: <span id="latest-hash">loading...</span>
+Verified: <span id="verified-date">loading...</span>
+Protocol: Proof of Human Work v1.0.0
+Node Type: Public Verification Node
+
+VERIFY A PROOF
+──────────────
+
+Method 1: Verify by Hash
+   Enter a proof hash to verify:
+   
+   Hash: [<input type="text" id="hash-input" placeholder="0x..." style="width: 400px; font-family: monospace;">]
+   [<button onclick="verifyByHash()">Verify</button>]
+
+Method 2: Verify via Registry API
+   Use the registry node API:
+   GET https://proofofhumanwork.org/pohw/verify/{hash}
+   
+   Or use the CLI:
+   $ pohw verify {hash}
+
+VERIFICATION RESULT
+───────────────────
+<span id="verification-result">—</span>
+
+VERIFICATION ENDPOINTS
+──────────────────────
+GET /pohw/verify/index.json
+  Node status and metadata
+
+GET /pohw/verify/index.cjson
+  Canonical JSON for hashing
+
+GET /pohw/verify/index.sig.bin
+  Binary signature file
+
+GET /pohw/verify/index.sig.b64
+  Base64-encoded signature
+
+PUBLIC KEY
+──────────
+Location: https://gdn.sh/.well-known/public.txt
+Fingerprint: SHA256:361132bb73b257cb8fcb0001d2328005f6b33b6ac5359f2394bc01c7571cc646
+
+REGISTRY
+────────
+Primary Registry: https://proofofhumanwork.org
+Registry API: https://proofofhumanwork.org/pohw/verify/{hash}
+
+PROTOCOL
+────────
+Full Specification: https://proofofhumanwork.org/spec
+Documentation: https://proofofhumanwork.org/docs
+
+<a href="../../">← Back to Home</a> | <a href="https://proofofhumanwork.org/verify">Full Verification Interface →</a>
+
+<script>
+// Load node status
+async function loadNodeStatus() {
+  try {
+    const res = await fetch('./index.json');
+    const data = await res.json();
+    
+    document.getElementById('node-status').textContent = data.status || 'unknown';
+    document.getElementById('latest-hash').textContent = data.hash ? data.hash.substring(0, 20) + '...' : 'n/a';
+    document.getElementById('verified-date').textContent = data.created ? new Date(data.created).toLocaleString() : 'n/a';
+  } catch (err) {
+    document.getElementById('node-status').textContent = 'error';
+    document.getElementById('latest-hash').textContent = '—';
+    document.getElementById('verified-date').textContent = '—';
+    console.error('Failed to load node status:', err);
+  }
+}
+
+// Verify by hash
+async function verifyByHash() {
+  const hash = document.getElementById('hash-input').value.trim();
+  const resultDiv = document.getElementById('verification-result');
+  
+  if (!hash) {
+    resultDiv.innerHTML = '❌ Please enter a hash';
+    return;
+  }
+  
+  // Remove 0x prefix if present for the API call
+  const cleanHash = hash.startsWith('0x') ? hash.substring(2) : hash;
+  
+  resultDiv.innerHTML = '⏳ Verifying...';
+  
+  try {
+    // Try registry node first
+    const registryUrl = `https://proofofhumanwork.org/pohw/verify/${hash}`;
+    const res = await fetch(registryUrl);
+    
+    if (res.ok) {
+      const data = await res.json();
+      
+      if (data.valid) {
+        resultDiv.innerHTML = `✅ VERIFIED\n\n` +
+          `Signer: ${data.signer || 'N/A'}\n` +
+          `Timestamp: ${data.timestamp || 'N/A'}\n` +
+          `Registry: ${data.registry || 'N/A'}\n` +
+          (data.merkle_root ? `Merkle Root: ${data.merkle_root.substring(0, 20)}...\n` : '') +
+          (data.merkle_proof ? `Merkle Proof: ${data.merkle_proof.length} steps\n` : '');
+      } else {
+        resultDiv.innerHTML = `❌ INVALID\n\n${data.error || 'Verification failed'}`;
+      }
+    } else {
+      // Fallback: check if hash matches node's latest hash
+      const nodeStatus = await fetch('./index.json').then(r => r.json());
+      if (nodeStatus.hash === hash || nodeStatus.hash === '0x' + cleanHash) {
+        resultDiv.innerHTML = `✅ HASH MATCHES NODE STATUS\n\n` +
+          `This hash matches the node's latest verified hash.\n` +
+          `For full verification, use the registry API.`;
+      } else {
+        resultDiv.innerHTML = `⚠️  HASH NOT FOUND\n\n` +
+          `This hash is not in the node's current status.\n` +
+          `Try the registry API: https://proofofhumanwork.org/pohw/verify/${hash}`;
+      }
+    }
+  } catch (err) {
+    resultDiv.innerHTML = `❌ ERROR\n\nFailed to verify: ${err.message}\n\n` +
+      `Try the registry API directly:\n` +
+      `https://proofofhumanwork.org/pohw/verify/${hash}`;
+    console.error('Verification error:', err);
+  }
+}
+
+// Allow Enter key to trigger verification
+document.getElementById('hash-input').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    verifyByHash();
+  }
+});
+
+// Load status on page load
+loadNodeStatus();
+</script>
+</pre>
+</body>
+</html>
+
