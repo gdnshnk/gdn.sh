@@ -1,0 +1,22 @@
+gdn.sh — PoHW Verification Node [00]
+
+STATUS: Active
+PROTOCOL: Proof of Human Work v1.0.0
+SIGNATURE FORMAT: SHA-256 • Ed25519
+
+This node provides stateless verification endpoints for Proof of Human Work attestations.
+
+VERIFICATION ENDPOINTS:
+- GET /pohw/verify/index.json — Node status and metadata
+- GET /pohw/verify/index.cjson — Canonical JSON for hashing
+- GET /pohw/verify/index.sig.bin — Binary signature file
+
+VERIFICATION:
+Upload file + signature → GET verdict (valid/invalid + signer DID + timestamp)
+
+PUBLIC KEY:
+https://gdn.sh/.well-known/public.txt
+
+PROTOCOL SPECIFICATION:
+https://proofofhumanwork.org/spec
+
