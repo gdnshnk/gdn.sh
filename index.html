@@ -3,60 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>gdn.sh : proof-of-human-work</title>
-<link rel="stylesheet" href="style.css">
+<title>gdn.sh — PoHW node[00]</title>
 </head>
 <body>
+<pre>gdn.sh — PoHW node[00]
 
-<main>
-<pre>
-> gdn.sh : node[00]
-> initialized : human-authorship-seed
-> environment : synthetic-media-era
-> objective : preservation of origin
+Public Key:
+https://gdn.sh/.well-known/public.txt
 
-[ status ]
-active : Proof of Human Work
-type : protocol
-mode : public trust infrastructure
-hash : 0x9642f0d7b915cb7c45a595b88287c4e41804d1727ec8679a1e8f958ebb2d4318
-last update : 2025-10-24
+Verification Endpoint:
+https://gdn.sh/pohw/verify
 
-> documentation : <a href="https://proofofhumanwork.org/paper/position.html">position-paper</a>
-> verification : <a href="/pohw/verify/index.json">pohw/verify</a>
-> public key : <a href="/.well-known/pohw-ci-public.pem">/.well-known/pohw-ci-public.pem</a>
+Protocol Reference:
+https://proofofhumanwork.org/spec
 
-# waiting-for-input _
+Signature Format:
+SHA-256 • Ed25519
 
-
-<div class="verification-block">
--------------------------------------------------
-attestation-proof : <a href="/pohw/verify/index.cjson">canonical record</a>  
-signature          : <a href="/pohw/verify/index.sig.bin">rsa-pkcs#8 signature</a>  
-verify-command     : openssl dgst -sha256 -verify .well-known/pohw-ci-public.pem -signature pohw/verify/index.sig.bin pohw/verify/index.cjson  
-integrity-hash     : 0x9642f0d7b915cb7c45a595b88287c4e41804d1727ec8679a1e8f958ebb2d4318  
-verifier-key       : <a href="https://gdn.sh/.well-known/pohw-ci-public.pem">https://gdn.sh/.well-known/pohw-ci-public.pem</a>  
-registry-anchor    : <a href="https://proofofhumanwork.org">https://proofofhumanwork.org</a>  
-verified-on        : 2025-10-25T00:00:00Z  
--------------------------------------------------
-</div>
-
-<div class="verification-block">
-[ legacy : deprecated 2025-10-25 ]  
-authorship-proof : <a href="/pohw/verify/index.cjson">canonical record</a>  
-signature        : <a href="/pohw/verify/index.cjson.sig">ed25519 (retired)</a>  
-verify-command   : ssh-keygen -Y verify -f allowed_signers -I gdn.sh -n pohw -s index.cjson.sig &lt; index.cjson  
-integrity-hash   : 1974b436a7d4f9681c01bf956eddd6254c4a3be440f1d1a47a511c9b90ed2eff  
-</div>
-</pre>
-</main>
-
-<script>
-setInterval(() => {
-  const c = document.querySelector('pre');
-  c.style.opacity = (c.style.opacity === '0.8') ? '1' : '0.8';
-}, 2200);
-</script>
-
+This node is part of the Proof of Human Work network.</pre>
 </body>
 </html>
