@@ -1,0 +1,12 @@
+{
+  "created": "2025-11-25T15:28:13.623Z",
+  "hash": "0x0x1192c693420eacc92cfbdd437ed695f21779f9404303b24b828a7dc1a5eacc65",
+  "node": "gdn.sh",
+  "protocol": "Proof of Human Work",
+  "public_key": "https://gdn.sh/.well-known/public.txt",
+  "registry": "https://proofofhumanwork.org",
+  "signature": "active",
+  "status": "active",
+  "type": "verification-node",
+  "verified_by": "PoHW Foundation"
+}
